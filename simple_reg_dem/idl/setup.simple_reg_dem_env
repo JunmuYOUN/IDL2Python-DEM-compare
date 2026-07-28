@@ -1,0 +1,2 @@
+# setup for simple_reg_dem package, S.L.Freeland 18-sep-2020
+setenv SIMPLE_REG_DEM_DATA $SSW_SIMPLE_REG_DEM/data
