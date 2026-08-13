@@ -1,3 +1,30 @@
+쉬운 한국어 안내
+================
+
+이 폴더는 1998년에 배포된 VDEM IDL 패키지다. 여기서 VDEM은 온도 분포가 아니라 스펙트럼
+선에서 구한 시선방향 속도 분포다. Yohkoh/BCS와 SoHO/SUMER 관측을 대상으로 한다.
+
+중요한 점:
+
+- VDEM 단위는 photons s-1 (km s-1)-1이다.
+- VDEM의 여러 모멘트는 플라즈마의 질량, 운동량, 엔탈피 흐름과 연결된다.
+- Yohkoh/BCS Ca XIX 자료는 여러 선이 섞여 있으므로 /CAXIX 선택 기능과 별도 원자 계수 자료를
+  사용한다.
+- SoHO/SUMER 자료는 /SUMER를 쓰고 기기 폭을 직접 지정해야 한다.
+- 원문은 VDEM의 오차가 각 속도 구간에서 서로 독립적이지 않으며, 순간적인 VDEM에 너무 강한
+  물리적 의미를 부여하지 말라고 경고한다.
+
+주요 참고 논문:
+Newton, Emslie & Mariska (1995), ApJ 447, 915
+https://ui.adsabs.harvard.edu/abs/1995ApJ...447..915N/abstract
+Newton, Emslie & Mariska (1996), ApJ 459, 804
+https://ui.adsabs.harvard.edu/abs/1996ApJ...459..804N/abstract
+Newton (1997), ApJ 484, 455
+https://ui.adsabs.harvard.edu/abs/1997ApJ...484..455N/abstract
+
+아래는 원저자가 배포한 영어 안내문이며 내용은 그대로 보존했다.
+----------------------------------------------------------------
+
 4/23/98
 
 This is the README.TXT document for a package of routines which computes

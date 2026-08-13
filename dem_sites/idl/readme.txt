@@ -1,3 +1,28 @@
+쉬운 한국어 안내
+================
+
+이 폴더는 SITES와 Grid-SITES의 IDL 원본 배포본이다.
+
+- SITES는 한 픽셀의 여러 채널 관측값에서 DEM을 반복 계산한다.
+- Grid-SITES는 많은 픽셀이나 시간 자료를 더 빠르게 처리하기 위한 방법이다.
+- 가장 간단한 시작 예제는 dem_example_sites.pro와 dem_example_gridsites.pro다.
+- AIA 예제를 실행하려면 AIA/SDO SSW 환경이 필요하며, 날짜와 폴더 위치는 사용 환경에 맞게
+  바꿔야 한다.
+- 관측 오차와 온도 응답함수의 오차가 모두 필요하다. 온도 구간 수, 온도 범위, 부드럽게 만드는
+  커널 폭은 사용자가 정한다.
+- 원저자는 AIA만 쓸 때 약 0.6 MK 아래로 내려가지 말 것을 권하고, 플레어 수준의 높은 온도는
+  충분히 시험하지 않았다고 밝힌다.
+
+이 방법을 연구에 사용하면 다음 두 논문을 인용해야 한다.
+
+[1] Morgan & Pickering (2019), SITES:
+    https://doi.org/10.1007/s11207-019-1525-4
+[2] Pickering & Morgan (2019), Grid-SITES:
+    https://doi.org/10.1007/s11207-019-1526-3
+
+아래는 원저자가 배포한 영어 안내문이며 내용은 그대로 보존했다.
+----------------------------------------------------------------
+
 This package implements the SITES DEM inversion method described in [1]. The package also includes the Grid-SITES method, that can greatly increase the efficiency of SITES (or other DEM inversions) described in [2].
 
 [1] https://ui.adsabs.harvard.edu/abs/2019SoPh..294..135M/abstract
@@ -30,4 +55,3 @@ There are only 3 user-set parameters that effect the core inversion routine. The
 
 CONTACT
 Huw Morgan, Aberystwyth University, hmorgan@aber.ac.uk
-

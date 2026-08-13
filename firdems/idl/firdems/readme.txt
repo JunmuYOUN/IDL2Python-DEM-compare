@@ -1,3 +1,24 @@
+쉬운 한국어 안내
+================
+
+이 폴더는 FIR DEM의 2012년 예비 IDL 배포본이다. AIA와 EIS용 실행 도우미, 일반 기기용
+firdem 함수, 결과 표시 함수, 시험 스크립트가 함께 들어 있다.
+
+- AIA: aia_firdem_wrapper를 사용한다. 채널 이름, 노출시간, 채널 영상 배열이 기본 입력이다.
+- EIS: 먼저 각 선의 방출률 정보를 파일로 만든 뒤 eis_firdem_wrapper를 사용한다.
+- 일반 기기: firdem을 직접 호출한다. 관측값, 오차, 노출시간, 채널 이름, 온도 응답함수가
+  필요하다.
+- 출력 구조체에는 DEM, DEM 오차, 온도축, 관측값과 다시 계산한 값, 채널별 χ² 등이 들어 있다.
+- test=1은 짧은 확인용이고 test=2는 시간이 더 오래 걸리는 상세 확인이다.
+
+관련 논문:
+Plowman, Kankelborg & Martens (2013),
+"Fast Differential Emission Measure Inversion of Solar Coronal Data"
+https://doi.org/10.1088/0004-637X/771/1/2
+
+아래는 원저자가 배포한 영어 안내문이며 내용은 그대로 보존했다.
+----------------------------------------------------------------
+
 Preliminary version of J.E. Plowman et al. fast, iterative, regularized DEM code, with test scripts, EIS and AIA wrappers, and routines for displaying the results.
 
 Computing DEMs:
