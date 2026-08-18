@@ -29,7 +29,7 @@ Thumbs.db
 # ---- Jupyter ----
 .ipynb_checkpoints/
 
-# ---- parity 검증 산출물 (여기엔 담지 않는다) ----
+# ---- parity verification outputs ----
 probes/
 reports/
 staging/
@@ -37,7 +37,11 @@ logs/
 *.npz
 *.npy
 
-# ---- Claude Code / 로컬 전용 ----
+# The checked-in PoC inputs and response table are intentional exceptions.
+!0_Test_set/*.npz
+!1_Resp/*.npz
+
+# ---- Local-only assistant settings ----
 .claude/
 .claude.json
 CLAUDE.md

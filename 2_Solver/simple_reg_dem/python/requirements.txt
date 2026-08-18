@@ -1,0 +1,5 @@
+numpy>=1.24
+scipy>=1.10
+# Parity-verified with numpy 1.26.4, scipy 1.11.4 (Python 3.10).
+# simple_reg_dem.py itself needs only numpy + scipy.linalg (cho_factor/cho_solve).
+# chk_dump.py (probe dumper) needs numpy only; no-op unless CHK_DIR is set.
