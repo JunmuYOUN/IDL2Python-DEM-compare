@@ -9,7 +9,9 @@ IDL idioms preserved:
     col-broadcast -> v[:,None].
   - ``total(x,2)`` (sum over IDL dim 2 = nwl) -> np.sum(axis=1); ``total(x,1)`` -> axis=0.
   - ``convol(a,ker,/edge_zero)`` -> np.convolve(a,ker,'same') (symmetric kernel, zero pad).
-  - ``gaussian_function(sigma,/norm)`` reimplemented: size 2*ceil(3*sigma)+1, float32.
+  - ``gaussian_function(sigma,/norm)`` reimplemented from the IDL 8.6 library
+    source: width = 2*((ceil(3*sigma)) OR 1)+1, float32 chain, glibc expf.
+    (2026-08-18 fix: the odd-forcing ``OR 1`` step was previously missing.)
   - arrays are [nt,nwl] (IDL logical), demmain float; internal math float64.
 """
 import numpy as np
@@ -17,12 +19,41 @@ import numpy as np
 from chk_dump import chk_dump
 
 
+try:                                # IDL float32 exp == glibc expf (1 ulp vs
+    import ctypes                   # numpy's SIMD exp) — same approach as the
+    _libm = ctypes.CDLL("libm.so.6")  # pintofale_mcmc port's idl_compat.
+    _libm.expf.restype = ctypes.c_float
+    _libm.expf.argtypes = [ctypes.c_float]
+
+    def _expf(arr):
+        return np.array([_libm.expf(np.float32(v)) for v in arr],
+                        dtype=np.float32)
+except (OSError, AttributeError):   # non-glibc fallback: 1-ulp differences
+    def _expf(arr):
+        return np.exp(np.asarray(arr, dtype=np.float32)).astype(np.float32)
+
+
 def gaussian_function(sigma):
-    """IDL gaussian_function(sigma,/normalize): centered Gaussian, size 2*ceil(3*sigma)+1."""
-    n = int(2 * np.ceil(3 * sigma) + 1)
-    x = np.arange(n) - (n - 1) / 2.0
-    g = np.exp(-x ** 2 / (2.0 * sigma ** 2))
-    return (g / np.sum(g)).astype(np.float32)
+    """IDL 8.6 lib/gaussian_function.pro, 1-D, /NORMALIZE — float32 faithful.
+
+    Width rule (verified against the IDL library source): w = CEIL(3*sigma);
+    w OR= 1 (force odd — this step was missing in the previous port and made
+    the kernel 21 instead of 23 whenever ceil(3*sigma) is even); size = 2*w+1.
+    Values: exp(-x^2/(2*sigma^2)) in float32, normalized by the float32 total
+    (TOTAL(..., /PRESERVE_TYPE)).
+    """
+    f32 = np.float32
+    s = f32(max(float(sigma), 0.00001))
+    w = int(np.ceil(f32(s * f32(3))))
+    w |= 1
+    n = 2 * w + 1
+    x = np.arange(n, dtype=f32) - f32(n // 2)
+    a1 = ((x * x) / (f32(2) * (s * s))).astype(f32)
+    g = _expf(-a1)
+    t = f32(0.0)
+    for v in g:
+        t = f32(t + v)
+    return (g / t).astype(f32)
 
 
 def dem_sites(obs_in, err_in, response, response_err, delta_temp,
@@ -42,7 +73,8 @@ def dem_sites(obs_in, err_in, response, response_err, delta_temp,
     gres = num / np.sum(num, axis=1)[:, None]
 
     obs = obs_in.copy()
-    nker = max(0.08 * nt, 0.5)
+    # IDL: nker=(0.08*nt)>0.5 — float32 literal chain preserved
+    nker = max(np.float32(np.float32(0.08) * np.float32(nt)), np.float32(0.5))
     if ker is None:
         ker = gaussian_function(nker)
     ker = np.asarray(ker)

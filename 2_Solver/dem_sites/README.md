@@ -306,3 +306,18 @@ Kernel `ker`는 IDL의 `gaussian_function`으로 계산해 외부 입력으로 �
 - Pickering & Morgan (2019), [GRID-SITES: Gridded Solar Iterative Temperature Emission Solver for Fast Differential Emission Measure Inversion](https://doi.org/10.1007/s11207-019-1526-3)
 
 원본 `idl/readme.txt`도 이 방법을 사용할 때 위 두 논문을 인용해 달라고 요청한다.
+
+---
+
+## 2026-08-18 재검증·수정 기록
+
+실관측 프레임(2011-02-15T01:49:50, disk center 128×128 = 16,384픽셀) 대조에서
+`gaussian_function`의 기본 커널 폭이 IDL과 달랐다(21 vs 23). 원인은 IDL 8.6
+`lib/gaussian_function.pro`의 폭 규칙 `width = 2*((CEIL(3σ)) OR 1)+1` 중
+홀수 강제(`OR 1`) 단계 누락 — `ceil(3σ)`가 짝수인 σ 구간(예: nt=41 → σ=3.28)에서만
+발현되어 기존 검증(커널 IDL 주입 방식)에서는 드러나지 않았다.
+
+수정: `gaussian_function`을 IDL 라이브러리 소스 충실 구현(float32 체인 + glibc
+`expf`)으로 교체, `nker` 계산의 float32 리터럴 체인 반영. 수정 후 커널은 IDL과
+비트 단위로 일치하며, 16,384픽셀 solver-core·end-to-end 대조에서 dem·demerr·
+obsmod·irep 전 항목 통과.

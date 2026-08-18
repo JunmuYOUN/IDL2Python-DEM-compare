@@ -265,3 +265,19 @@ LP 실패(`status = 1`) 또는 음수 해(`status = 10`)로 표시된 픽셀은 
 ## 참고 논문
 
 - Cheung et al. (2015), [Thermal Diagnostics with the Atmospheric Imaging Assembly onboard the Solar Dynamics Observatory: A Validated Method for Differential Emission Measure Inversions](https://doi.org/10.1088/0004-637X/807/2/143)
+
+---
+
+## 2026-08-18 재검증·엔진 교체 기록
+
+실관측 프레임(2011-02-15T01:49:50, disk center 128×128) 대조에서 scipy HiGHS 엔진은
+IDL과 크게 갈렸다: IDL 내장 `SIMPLEX`(Numerical Recipes simplx)는 실데이터 픽셀의
+50.5%에서 status=3("did not converge")로 종료하며 EM=0을 반환하는 반면, HiGHS는
+99.93%를 해결한다. 양쪽 모두 해를 찾은 픽셀에서도 축퇴 정점 선택이 달랐다.
+
+수정: 기본 LP 엔진을 IDL `SIMPLEX`의 float32 충실 재구현(`engine="idl"`)으로
+교체 — NR simplx 알고리즘, EPS 의미론(`eps*max(y)*8e-4`), 비수렴 시 0 벡터 반환,
+status 0/1/2/3/10/11 규약, float32 constraint tableau, basis_funcs fltarr 규약까지
+재현. 16,384픽셀에서 status·zmax·coeffs·oem 전 항목이 IDL과 일치한다.
+기존 HiGHS 경로는 `engine="highs"`로 보존 — 수치 동일성은 없지만 IDL simplex가
+못 푸는 픽셀을 해결하는 더 강건한 엔진이므로 연구 용도로 선택 가능하다.
