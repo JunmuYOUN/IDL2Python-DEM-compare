@@ -17,7 +17,8 @@ def main():
     image=np.transpose(inp["image"])           # (6,1,1)->(1,1,6)
     Dict, basis=aia_sparse_em_init(tresp, lgtaxis)
     coeffs, oem, zmax, status=aia_sparse_em_solve(image, Dict, basis,
-                                                  tolfac=float(inp["tolfac"]), eps=float(inp["eps"]))
+                                                  tolfac=float(inp["tolfac"]), eps=float(inp["eps"]),
+                                                  engine="highs")
     print("total(coeffs)=", float(coeffs.sum()), " peak oem=", float(oem.max()),
           " status=", float(status.ravel()[0]), " nonzero=", int((coeffs>0).sum()))
 main()

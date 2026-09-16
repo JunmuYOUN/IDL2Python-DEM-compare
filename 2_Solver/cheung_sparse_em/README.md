@@ -13,7 +13,9 @@
 방법 자체의 특징이다. `tolfac`을 키우면 관측값을 허용하는 범위가 넓어지고, 보통 더 적은 성분을
 선택한다. 상태값이 1 또는 10인 픽셀은 계수가 모두 0이므로 결과에서 제외해야 한다.
 
-IDL의 `simplex` 대신 Python에서는 SciPy의 `linprog`를 쓴다. 답이 여러 개인 경우 계수 배열은
+IDL의 `simplex` 대신 Python의 일반 계산 경로에서는 SciPy
+`linprog(method="highs")`를 쓴다. `aia_sparse_em_solve`의 기본값도 `engine="highs"`이며,
+저장소의 실행 코드도 이 값을 명시한다. 답이 여러 개인 경우 계수 배열은
 달라도 다시 계산한 채널 밝기는 같을 수 있다. 변환본은 두 시험 세트에서 각각 15개 비교 항목과
 회귀 테스트 4개를 통과했다.
 
@@ -275,9 +277,16 @@ IDL과 크게 갈렸다: IDL 내장 `SIMPLEX`(Numerical Recipes simplx)는 실�
 50.5%에서 status=3("did not converge")로 종료하며 EM=0을 반환하는 반면, HiGHS는
 99.93%를 해결한다. 양쪽 모두 해를 찾은 픽셀에서도 축퇴 정점 선택이 달랐다.
 
-수정: 기본 LP 엔진을 IDL `SIMPLEX`의 float32 충실 재구현(`engine="idl"`)으로
+당시 수정: 기본 LP 엔진을 IDL `SIMPLEX`의 float32 충실 재구현(`engine="idl"`)으로
 교체 — NR simplx 알고리즘, EPS 의미론(`eps*max(y)*8e-4`), 비수렴 시 0 벡터 반환,
 status 0/1/2/3/10/11 규약, float32 constraint tableau, basis_funcs fltarr 규약까지
 재현. 16,384픽셀에서 status·zmax·coeffs·oem 전 항목이 IDL과 일치한다.
 기존 HiGHS 경로는 `engine="highs"`로 보존 — 수치 동일성은 없지만 IDL simplex가
 못 푸는 픽셀을 해결하는 더 강건한 엔진이므로 연구 용도로 선택 가능하다.
+
+## 2026-09-16 HiGHS 기본화
+
+운영 계산 정책을 HiGHS로 통일했다. `aia_sparse_em_solve`는 별도 인자를 주지 않아도
+`engine="highs"`를 사용하며, 저장소 내 실행 코드도 HiGHS를 명시한다. 위 2026-08-18의
+IDL 기본화 기록은 과거 재현 이력이며 현재 기본값을 설명하지 않는다. `engine="idl"`은
+IDL 기준 결과를 재현해야 하는 경우에만 명시적으로 선택하는 호환 모드다.

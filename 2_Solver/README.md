@@ -81,6 +81,11 @@ Python으로 옮길 때 무엇을 조심했는지, 그리고 **어디까지 확�
 
 ## Python 코드 사용 시 주의
 
+- **계산 엔진 정책:** IDL의 `SIMPLEX`를 사용하던 LP 기반 `cheung_sparse_em` 변환본은
+  일반 계산과 저장소 내 실행 코드에서 모두 SciPy HiGHS
+  (`linprog(method="highs")`)를 사용한다. IDL simplex 재현 엔진은 과거 결과를 대조하는
+  명시적 호환 모드(`engine="idl"`)로만 남겨 둔다. 나머지 변환본은 GSVD, MCMC,
+  비선형 최소제곱 등 LP가 아닌 알고리즘이므로 HiGHS 적용 대상이 아니다.
 - 각 `python/` 디렉터리는 **다른 패키지와 분리되어 있다.** solver 모듈이 같은 디렉터리의
   `chk_dump` 등을 불러오므로, 해당 디렉터리를
   `sys.path`에 넣고 쓴다.

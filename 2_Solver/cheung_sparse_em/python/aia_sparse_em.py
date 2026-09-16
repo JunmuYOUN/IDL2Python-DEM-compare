@@ -3,13 +3,11 @@
 Basis-pursuit DEM: minimise L1(EM coefficients) s.t. the reconstructed DN lies within a
 tolerance band of the observed DN, coefficients >= 0.
 
-2026-08-18 engine change: the default LP engine is now a faithful float32
-reimplementation of IDL's built-in `simplex` (Numerical Recipes simplx, per the
-IDL documentation), including its EPS semantics and non-convergence behaviour
-(status=3 with an all-zero result). This reproduces the IDL original's numbers
-on real data — including its failures. The previous scipy.optimize.linprog
-(HiGHS) engine is kept as `engine="highs"`; it is more robust (it solves pixels
-IDL's simplex cannot) but is NOT numerically parity-equivalent to the IDL code.
+The production/default LP engine is SciPy ``linprog(method="highs")``.  A
+faithful float32 reimplementation of IDL's built-in ``simplex`` is retained as
+``engine="idl"`` only for historical parity checks.  It reproduces the IDL
+original's numbers on real data, including its non-convergence failures, and
+must not be used as the normal calculation path.
 
 Status values (IDL SIMPLEX convention):
   0 success · 1 unbounded · 2 infeasible · 3 did not converge ·
@@ -196,8 +194,12 @@ def _idl_simplex(zeq, rows, m1, m2, m3, eps, itmax=5000):
 
 
 def aia_sparse_em_solve(image, Dict, basis_funcs, tolfac=1.4, eps=1e-3,
-                        symmbuff=1.0, engine="idl", itmax=5000):
-    """Per-pixel sparse-EM LP. Returns (coeffs, oem, zmax, status). image is [nx,ny,nchan]."""
+                        symmbuff=1.0, engine="highs", itmax=5000):
+    """Solve the per-pixel sparse-EM LP, using HiGHS by default.
+
+    Returns ``(coeffs, oem, zmax, status)``; ``image`` is ``[nx, ny, nchan]``.
+    ``engine="idl"`` exists only to reproduce historical IDL parity results.
+    """
     image = np.asarray(image, dtype=np.float64)
     nx, ny, nchannels = image.shape
     nbasis = Dict.shape[1]
